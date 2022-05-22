@@ -54,53 +54,7 @@ client.once("ready", () => {
       // NOTE: This fetch is probably redundant, but the typing dictates it,
       // I'd rather not risk it as I don't know if Discord.OAuth2Guild extends Discord.Guild,
       // based on the typings though, I'm fairly sure it's not.
-      guild.fetch().then((guild) => {
-        guild.commands.fetch().then((commands) => {
-          // Check if slash command is deployed
-          if (!commands.filter((command) => command.name == "suggest").size) {
-            logger(`Deploying slash command to ${guild.name}...`);
-
-            guild.commands.create({
-              name: "suggest",
-              description: `Suggest a new feature for ${
-                procenv.GUILD_NAME
-                  ? procenv.GUILD_NAME
-                  : (() => {
-                      logger(
-                        "No GUILD_NAME specified in .env, using default value..."
-                      );
-                      return guild.name;
-                    })()
-              }`,
-              options: [
-                {
-                  name: "create",
-                  description: "Create a new suggestion",
-                  required: true,
-                  type: "SUB_COMMAND",
-                  options: [
-                    {
-                      name: "type",
-                      description: "The type of suggestion",
-                      type: "STRING",
-                      required: true,
-                      choices: ["feature", "prompt"],
-                    },
-                    {
-                      name: "content",
-                      description: "The content of the suggestion",
-                      type: "STRING",
-                      required: true,
-                    },
-                  ],
-                },
-              ],
-            });
-          } else {
-            logger(`Slash command already deployed to ${guild.name}`);
-          }
-        });
-      });
+      guild.fetch().then((guild) => {});
     });
   });
   client.on("ready", () => {
