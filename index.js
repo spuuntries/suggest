@@ -16,11 +16,9 @@ const procenv = process.env,
       name: "db",
     });
   })(),
-  crypt = require("./utils/crypto");
-
-function logger(message) {
-  console.log(`[${new Date()}] ${message}`);
-}
+  crypt = require("./utils/crypto"),
+  deploy = require("./utils/deploy"),
+  logger = require("./utils/logger");
 
 function login() {
   client.login(procenv.TOKEN).catch((err) => {
@@ -54,7 +52,9 @@ client.once("ready", () => {
       // NOTE: This fetch is probably redundant, but the typing dictates it,
       // I'd rather not risk it as I don't know if Discord.OAuth2Guild extends Discord.Guild,
       // based on the typings though, I'm fairly sure it's not.
-      guild.fetch().then((guild) => {});
+      guild.fetch().then((guild) => {
+        deploy(client, guild);
+      });
     });
   });
   client.on("ready", () => {

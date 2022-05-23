@@ -1,4 +1,5 @@
-const Discord = require("discord.js");
+const Discord = require("discord.js"),
+  logger = require("./logger");
 
 /**
  * Deploys slash command to Discord guilds.
@@ -10,6 +11,20 @@ module.exports = (client, guild) => {
     // Check if slash command is deployed
     if (!commands.filter((command) => command.name == "suggest").size) {
       logger(`Deploying slash command to ${guild.name}...`);
+
+      /** @type {Discord.Role} */
+      let staffRole;
+
+      // Get role with name "staff", if not available skip
+      guild.roles.fetch().then((roles) => {
+        staffRole = roles.find((role) =>
+          role.name.toLowerCase().includes("staff")
+        );
+        if (!staffRole) {
+          logger(`Could not find staff role in ${guild.name}, skipping...`);
+          return;
+        }
+      });
 
       guild.commands.create({
         name: "suggest",
@@ -50,7 +65,8 @@ module.exports = (client, guild) => {
               },
               {
                 name: "thumbnail",
-                description: "The thumbnail of the suggestion",
+                description:
+                  "The thumbnail of the suggestion (A link to an image)",
                 type: "STRING",
               },
               {
@@ -140,6 +156,7 @@ module.exports = (client, guild) => {
             ],
           },
           {
+            // A mod utility command, make sure only staff can use it
             name: "sudo",
             description: "Moderator utilities",
             type: "SUB_COMMAND_GROUP",
@@ -234,6 +251,32 @@ module.exports = (client, guild) => {
                     name: "reason",
                     description: "The reason for unbanning",
                     type: "STRING",
+                  },
+                ],
+              },
+              {
+                name: "edit",
+                description: "Edit a suggestion (as a moderator)",
+                type: "SUB_COMMAND",
+                options: [
+                  {
+                    name: "id",
+                    description: "The ID of the suggestion",
+                    type: "STRING",
+                    required: true,
+                  },
+                  {
+                    name: "edit",
+                    description: "What to edit",
+                    type: "STRING",
+                    required: true,
+                    choices: ["title", "content", "type", "thumbnail"],
+                  },
+                  {
+                    name: "value",
+                    description: "The value to edit to",
+                    type: "STRING",
+                    required: true,
                   },
                 ],
               },
